@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>KZ GFX | GFX Artist</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+
+  <style>
+    :root {
+      --bg: #0b0b0b;
+      --card: #151515;
+      --text: #fff;
+      --accent: #ff0000;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    /* NAV */
+    nav {
+      position: fixed;
+      top: 0;
+      width: 100%;
+      padding: 15px 40px;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(10px);
+      z-index: 1000;
+    }
+    nav h1 {
+      color: var(--accent);
+      font-size: 1.8rem;
+    }
+
+    /* ABOUT */
+    .about {
+      padding: 90px 8% 60px;
+      display: flex;
+      gap: 50px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .about img {
+      width: 220px;
+      height: 220px;
+      border-radius: 50%;
+      border: 4px solid var(--accent);
+      animation: pulse 3s infinite;
+    }
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+      100% { transform: scale(1); }
+    }
+    .about-content {
+      max-width: 500px;
+    }
+    .about-content button {
+      margin-top: 15px;
+      padding: 10px 25px;
+      background: var(--accent);
+      border: none;
+      color: #fff;
+      border-radius: 25px;
+      cursor: pointer;
+    }
+
+    /* CONTACT POPUP */
+    .contact-popup {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.85);
+      justify-content: center;
+      align-items: center;
+      z-index: 2000;
+      opacity: 0;
+      transition: opacity 0.4s ease;
+    }
+    .contact-popup.active {
+      opacity: 1;
+    }
+
+    .contact-box {
+      background: var(--card);
+      padding: 35px;
+      border-radius: 20px;
+      text-align: center;
+      max-width: 420px;
+      width: 90%;
+      transform: scale(0.9);
+      transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);
+      border: 1px solid rgba(255, 0, 0, 0.2);
+    }
+    .contact-popup.active .contact-box {
+      transform: scale(1);
+    }
+
+    .contact-box h3 {
+      margin-bottom: 20px;
+      color: var(--accent);
+      font-size: 1.6rem;
+    }
+
+    .contact-box a {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      margin: 14px 0;
+      padding: 12px 0;
+      color: #fff;
+      text-decoration: none;
+      font-size: 1.1rem;
+      border-radius: 12px;
+      transition: background 0.25s, color 0.25s;
+    }
+    .contact-box a:hover {
+      background: rgba(255, 0, 0, 0.15);
+      color: var(--accent);
+    }
+    .contact-box a i {
+      font-size: 1.3rem;
+    }
+
+    .contact-box button {
+      margin-top: 20px;
+      padding: 10px 25px;
+      background: var(--accent);
+      color: white;
+      border: none;
+      border-radius: 25px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: background 0.3s;
+    }
+    .contact-box button:hover {
+      background: #cc0000;
+    }
+
+    /* WORK SECTION */
+    section {
+      padding: 60px 8% 80px;
+    }
+    .section-title {
+      font-size: 2.2rem;
+      border-left: 5px solid var(--accent);
+      padding-left: 15px;
+      margin-bottom: 25px;
+    }
+
+    .work-menu {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .work-menu button {
+      background: none;
+      border: 1px solid var(--accent);
+      color: #fff;
+      padding: 8px 18px;
+      border-radius: 20px;
+      cursor: pointer;
+    }
+    .work-menu button.active,
+    .work-menu button:hover {
+      background: var(--accent);
+    }
+
+    .sub-menu {
+      display: none;
+      gap: 12px;
+      margin-bottom: 25px;
+      flex-wrap: wrap;
+    }
+    .sub-menu button {
+      padding: 7px 18px;
+      border-radius: 18px;
+      border: 1px solid var(--accent);
+      background: none;
+      color: #fff;
+      cursor: pointer;
+    }
+    .sub-menu button.active,
+    .sub-menu button:hover {
+      background: var(--accent);
+    }
+
+    /* ✅ 2 COLUMNS GRID */
+    .work-grid {
+      display: none;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+      padding: 0 5%;
+    }
+    .work-grid.active {
+      display: grid;
+    }
+
+    .work-card {
+      background: var(--card);
+      border-radius: 15px;
+      overflow: hidden;
+      position: relative;
+      padding-top: 56.25%; /* 16:9 */
+      height: 0;
+    }
+    .work-card img {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.3s ease;
+      cursor: pointer;
+    }
+    .work-card:hover img {
+      transform: scale(1.08);
+    }
+
+    .work-card .placeholder {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: #222;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #666;
+      font-size: 14px;
+      text-align: center;
+      padding: 10px;
+      line-height: 1.4;
+    }
+
+    /* ✅ LIGHTBOX */
+    .lightbox {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.95);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 3000;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    .lightbox.active {
+      display: flex;
+      opacity: 1;
+    }
+    .lightbox-content {
+      position: relative;
+      max-width: 90%;
+      max-height: 90%;
+    }
+    .lightbox img {
+      max-width: 100%;
+      max-height: 90vh;
+      border: 3px solid var(--accent);
+      border-radius: 8px;
+      box-shadow: 0 0 30px rgba(255, 0, 0, 0.5);
+    }
+    .lightbox .close-btn {
+      position: absolute;
+      top: -50px;
+      right: 0;
+      color: white;
+      font-size: 2rem;
+      cursor: pointer;
+      background: var(--accent);
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    footer {
+      text-align: center;
+      padding: 30px;
+      background: #000;
+    }
+
+    @media (max-width: 768px) {
+      .about {
+        text-align: center;
+        justify-content: center;
+        padding: 100px 8% 60px;
+      }
+      section {
+        padding: 60px 8%;
+      }
+      .work-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 15px;
+      }
+      .lightbox .close-btn {
+        top: -40px;
+        right: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <h1>KZ GFXx</h1>
+  </nav>
+
+  <div class="about">
+    <img src="https://media1.tenor.com/m/_l-61M8VusgAAAAC/gojo-gojo-satoru.gif" onerror="this.src='https://via.placeholder.com/220/ff0000/ffffff?text=KRINZY'" alt="Profile GIF">
+    <div class="about-content">
+      <h2>About Me</h2>
+      <p>I design thumbnails, overlays, PSDs & branding for creators.</p>
+      <p>I also build website and server.</p>
+      <button onclick="openContact()">Contact Me</button>
+    </div>
+  </div>
+
+  <div class="contact-popup" id="contact">
+    <div class="contact-box">
+      <h3>Get In Touch</h3>
+      <a href="https://discord.com/users/1087249072848633886">DM ME HERE</a>
+      <a href="https://www.youtube.com/@KR1NZY">
+        <i class="fab fa-youtube"></i> Support him
+      <a href="https://discord.gg/ytNwnZkda8">
+        <i class="fab fa-discord"></i>Friend Discord
+      </a>
+      <button onclick="closeContact()">Close</button>
+    </div>
+  </div>
+
+  <section>
+    <h2 class="section-title">My Work</h2>
+
+    <div class="work-menu">
+      <button class="active" onclick="showMain('thumb', this)">Thumbnail</button>
+      <button onclick="showMain('overlay', this)">Overlay</button>
+      <button onclick="showMain('logo', this)">Logo</button>
+      <button onclick="showMain('banner', this)">Banner</button>
+      <button onclick="showMain('score', this)">Scoreboard</button>
+      <button onclick="showMain('psd', this)">PSD</button>
+    </div>
+
+    <div class="sub-menu" id="overlay-sub">
+      <button class="active" onclick="showSub('overlay-normal', this)">Overlay</button>
+       <button onclick="showSub('short overlay', this)">short Overlay</button>
+       <button onclick="showSub('overlay-animated', this)">Animated Overlay</button>
+    </div>
+
+    <div class="sub-menu" id="psd-sub">
+      <button class="active" onclick="showSub('psd-free', this)">Free PSD</button>
+      <button onclick="showSub('psd-premium', this)">Premium PSD</button>
+    </div>
+
+    <div id="thumb" class="work-grid active"></div>
+    <div id="overlay-normal" class="work-grid"></div>
+    <div id="overlay-animated" class="work-grid"></div>
+     <div id="short overlay" class="work-grid"></div>
+    <div id="psd-free" class="work-grid"></div>
+    <div id="psd-premium" class="work-grid"></div>
+    <div id="logo" class="work-grid"></div>
+    <div id="banner" class="work-grid"></div>
+    <div id="score" class="work-grid"></div>
+  </section>
+
+  <!-- ✅ LIGHTBOX -->
+  <div class="lightbox" id="lightbox" onclick="closeLightboxOnOutside(event)">
+    <div class="lightbox-content">
+      <span class="close-btn" onclick="closeLightbox()">&times;</span>
+      <img id="lightbox-img" src="">
+    </div>
+  </div>
+
+  <footer>Copyright © 2026. All rights reserved.</footer>
+
+  <script>
+    const workData = {
+      thumb: [
+        "https://media.discordapp.net/attachments/1217474476963532851/1382585715338117213/Picsart_25-06-12_10-17-48-444.png?ex=6976f549&is=6975a3c9&hm=342c25860be8e316fabb449ed4db6ae271cb53525a961a5faaf1c3b40be7eb07&=&format=webp&quality=lossless&width=986&height=668",
+        "https://media.discordapp.net/attachments/1217474476963532851/1382585714889199646/Picsart_25-06-12_10-16-10-678.png?ex=6976f549&is=6975a3c9&hm=77d2107fba6723eafe8850b450d12ff7e47631150b32a27cd85f334f02ecb541&=&format=webp&quality=lossless&width=986&height=668",
+        "https://media.discordapp.net/attachments/1217474476963532851/1382585714251661416/Picsart_25-06-12_10-08-45-156.png?ex=6976f549&is=6975a3c9&hm=580688882ac55af90b3da54314c8d67d713283d5f8705f3082e797933959bad7&=&format=webp&quality=lossless&width=986&height=668",
+        "https://media.discordapp.net/attachments/1217474476963532851/1382585713719115787/Picsart_25-06-12_09-44-31-864.png?ex=6976f549&is=6975a3c9&hm=f2fb11aa69ce2e3f2b8540bad0032fea049e2bd29fbed11cbc5e4ceba9c5cf84&=&format=webp&quality=lossless&width=986&height=668"
+      ],
+      "overlay-normal": [
+        "https://media.discordapp.net/attachments/1217474476963532851/1464934156495622379/Picsart_26-01-25_16-05-19-856.png?ex=697745c0&is=6975f440&hm=0f9a44188169869d25196cb8b74b8665fda6322a6f38287f3e24e4a5d36bf024&=&format=webp&quality=lossless&width=1188&height=668",
+        "https://media.discordapp.net/attachments/1217474476963532851/1464934156940345344/Picsart_26-01-25_16-14-55-802.png?ex=697745c0&is=6975f440&hm=31e6fd40ded88a7c195356ca04c4af382313a219cc2db8cebe74c0df7c476bae&=&format=webp&quality=lossless&width=1188&height=668"
+      ],
+      "short overlay": ["https://media.discordapp.net/attachments/1217474476963532851/1464947094753247242/Picsart_26-01-25_17-06-32-901.png?ex=697751cc&is=6976004c&hm=a226a5955d643d5c200412d76938ca58846b18c8551156ce17cb4402a35b813e&=&format=webp&quality=lossless&width=688&height=386","https://media.discordapp.net/attachments/1217474476963532851/1464943901164175400/Picsart_26-01-25_16-47-28-927.png?ex=69774ed3&is=6975fd53&hm=6d534ef6588c30e8e249555778823a4a5313965ca2ff601e81d962921d21ab82&=&format=webp&quality=lossless&width=1186&height=668"],
+      "overlay-animated": [
+        "assets/overlays/animated/1.gif"
+      ],
+      "psd-free": ["assets/psd/free/1.jpg"],
+      "psd-premium": ["assets/psd/premium/1.jpg"],
+      logo: ["https://media.discordapp.net/attachments/1217474476963532851/1464938017671090280/Picsart_26-01-25_16-26-07-118.png?ex=69774958&is=6975f7d8&hm=28642ad86e8481ecf4dc3b451830e51b4eca70dd9815944a2574b5dfecb1e75f&=&format=webp&quality=lossless&width=1188&height=668","https://media.discordapp.net/attachments/1217474476963532851/1464938015385325678/Picsart_26-01-25_16-30-17-763.png?ex=69774958&is=6975f7d8&hm=1592d02815c1213b6f9f175c4b1624243e7623eaf41c77622aaecfd4585a93e6&=&format=webp&quality=lossless&width=1188&height=668","https://media.discordapp.net/attachments/1217474476963532851/1464938016857653431/Picsart_26-01-25_16-27-51-624.png?ex=69774958&is=6975f7d8&hm=7ee6b2bfce7d5a16f1f255f6618e1e1fc15690dab1b6c74dfbc052eea1b51650&=&format=webp&quality=lossless&width=1188&height=668"],
+      banner: ["https://media.discordapp.net/attachments/1217474476963532851/1382585715811942491/Picsart_25-06-12_10-22-16-109.png?ex=6976f549&is=6975a3c9&hm=a75d82b0622b3d149bf133b61f98d978ecf9b14a0ce5ec3b151646e9255a44af&=&format=webp&quality=lossless&width=986&height=668",
+        "https://media.discordapp.net/attachments/1217474476963532851/1464928084124762235/make-professional-anime-youtube-banner-yt-anime-banner-gaming-banner.jpg?ex=69774018&is=6975ee98&hm=5e9dd622e5ebbfb6a18651bee372af2d16f13eef1bca1bdc4679921c4a83fc0f&=&format=webp&width=1186&height=668"
+      ],
+      score: [
+        "https://media.discordapp.net/attachments/1217474476963532851/1464935615719018770/Picsart_26-01-25_16-03-00-784.png?ex=6977471b&is=6975f59b&hm=e64b4fbf0e196c1060397439f5742f9e25b90a53771530ebb4a3ec75afd4b892&=&format=webp&quality=lossless&width=1188&height=668",
+        "https://media.discordapp.net/attachments/1217474476963532851/1464935616792756522/Picsart_26-01-25_16-02-33-730.png?ex=6977471c&is=6975f59c&hm=0091747c9125c8011f7a766c3b64cfcf0b3e304cb0a41421a8472a82253d8752&=&format=webp&quality=lossless&width=1188&height=668"
+      ]
+    };
+
+    // ✅ LIGHTBOX FUNCTIONS
+    function openLightbox(src) {
+      document.getElementById('lightbox-img').src = src;
+      document.getElementById('lightbox').classList.add('active');
+      // ❌ DO NOT disable body scroll → allow scrolling
+    }
+
+    function closeLightbox() {
+      document.getElementById('lightbox').classList.remove('active');
+    }
+
+    // ✅ Close when clicking outside the image
+    function closeLightboxOnOutside(e) {
+      if (e.target === document.getElementById('lightbox')) {
+        closeLightbox();
+      }
+    }
+
+    // Close on ESC
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        closeLightbox();
+      }
+    });
+
+    // ✅ RENDER GRIDS
+    function renderWorkGrids() {
+      Object.keys(workData).forEach(id => {
+        const container = document.getElementById(id);
+        if (!container) return;
+
+        container.innerHTML = '';
+        workData[id].forEach(src => {
+          const card = document.createElement('div');
+          card.className = 'work-card';
+
+          const img = document.createElement('img');
+          img.src = src;
+          img.alt = "Work image";
+          img.onclick = () => openLightbox(src);
+
+          img.onerror = function() {
+            this.style.display = 'none';
+            const placeholder = document.createElement('div');
+            placeholder.className = 'placeholder';
+            placeholder.textContent = 'Image not found';
+            this.parentElement.appendChild(placeholder);
+          };
+
+          card.appendChild(img);
+          container.appendChild(card);
+        });
+      });
+    }
+
+    // ✅ NAVIGATION
+    function hideAll() {
+      document.querySelectorAll('.work-grid').forEach(g => g.classList.remove('active'));
+      document.querySelectorAll('.sub-menu').forEach(s => s.style.display = 'none');
+    }
+
+    function showMain(type, btn) {
+      hideAll();
+      document.querySelectorAll('.work-menu button').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+
+      if (type === 'overlay') {
+        document.getElementById('overlay-sub').style.display = 'flex';
+        showSub('overlay-normal', document.querySelector('#overlay-sub button'));
+      } else if (type === 'psd') {
+        document.getElementById('psd-sub').style.display = 'flex';
+        showSub('psd-free', document.querySelector('#psd-sub button'));
+      } else {
+        document.getElementById(type)?.classList.add('active');
+      }
+    }
+
+    function showSub(id, btn) {
+      document.querySelectorAll('.sub-menu button').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      document.querySelectorAll('.work-grid').forEach(g => g.classList.remove('active'));
+      document.getElementById(id)?.classList.add('active');
+    }
+
+    // ✅ CONTACT
+    function openContact() {
+      const popup = document.getElementById('contact');
+      popup.style.display = 'flex';
+      setTimeout(() => popup.classList.add('active'), 10);
+    }
+
+    function closeContact() {
+      const popup = document.getElementById('contact');
+      popup.classList.remove('active');
+      setTimeout(() => popup.style.display = 'none', 400);
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && document.getElementById('contact').style.display !== 'none') {
+        closeContact();
+      }
+    });
+
+    // ✅ INIT
+    document.addEventListener('DOMContentLoaded', () => {
+      renderWorkGrids();
+    });
+  </script>
+
+</body>
+</html>
