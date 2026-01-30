@@ -6,13 +6,19 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
-
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+    
     :root {
-      --bg: #0b0b0b;
-      --card: #151515;
+      --bg: #0a0a0f;
+      --card: #12121a;
       --text: #fff;
-      --accent: #ff0000;
+      --accent: #ff0040;
+      --accent-glow: rgba(255, 0, 64, 0.4);
+      --depth-1: 0 4px 6px rgba(0,0,0,0.3), 0 10px 20px rgba(0,0,0,0.4);
+      --depth-2: 0 10px 30px rgba(0,0,0,0.5), 0 20px 40px rgba(0,0,0,0.4);
+      --depth-3: 0 20px 50px rgba(0,0,0,0.6), 0 30px 60px rgba(0,0,0,0.5);
+      --neon-glow: 0 0 20px var(--accent-glow), 0 0 40px var(--accent-glow), 0 0 60px rgba(255, 0, 64, 0.2);
     }
 
     * {
@@ -25,198 +31,489 @@
     body {
       background: var(--bg);
       color: var(--text);
+      perspective: 1000px;
+      overflow-x: hidden;
     }
 
-    /* NAV */
-    nav {
+    /* 3D Background Grid */
+    body::before {
+      content: '';
       position: fixed;
       top: 0;
+      left: 0;
       width: 100%;
-      padding: 15px 40px;
-      background: rgba(0, 0, 0, 0.6);
-      backdrop-filter: blur(10px);
-      z-index: 1000;
+      height: 100%;
+      background-image: 
+        linear-gradient(rgba(255, 0, 64, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 0, 64, 0.03) 1px, transparent 1px);
+      background-size: 50px 50px;
+      transform: perspective(500px) rotateX(60deg) scale(2);
+      transform-origin: center top;
+      pointer-events: none;
+      z-index: -1;
+      animation: gridMove 20s linear infinite;
     }
+
+    @keyframes gridMove {
+      0% { transform: perspective(500px) rotateX(60deg) scale(2) translateY(0); }
+      100% { transform: perspective(500px) rotateX(60deg) scale(2) translateY(50px); }
+    }
+
+    /* NAV - 3D Floating */
+    nav {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: calc(100% - 40px);
+      max-width: 1200px;
+      padding: 15px 30px;
+      background: rgba(10, 10, 15, 0.8);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 0, 64, 0.2);
+      border-radius: 20px;
+      z-index: 1000;
+      box-shadow: var(--depth-2), 0 0 30px rgba(255, 0, 64, 0.1);
+      transform-style: preserve-3d;
+      transition: all 0.3s ease;
+    }
+    
+    nav:hover {
+      transform: translateX(-50%) translateZ(20px);
+      box-shadow: var(--depth-3), var(--neon-glow);
+    }
+
     nav h1 {
       color: var(--accent);
       font-size: 1.8rem;
+      text-shadow: 0 0 20px var(--accent-glow);
+      transform: translateZ(30px);
     }
 
-    /* ABOUT */
+    /* 3D Floating Particles */
+    .particles {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: -1;
+      overflow: hidden;
+    }
+
+    .particle {
+      position: absolute;
+      width: 4px;
+      height: 4px;
+      background: var(--accent);
+      border-radius: 50%;
+      opacity: 0.6;
+      animation: float3d 15s infinite ease-in-out;
+      box-shadow: 0 0 10px var(--accent);
+    }
+
+    @keyframes float3d {
+      0%, 100% { transform: translate3d(0, 0, 0) scale(1); opacity: 0.3; }
+      25% { transform: translate3d(100px, -50px, 100px) scale(1.5); opacity: 0.8; }
+      50% { transform: translate3d(-50px, -100px, 50px) scale(1); opacity: 0.5; }
+      75% { transform: translate3d(50px, 50px, 150px) scale(1.2); opacity: 0.7; }
+    }
+
+    /* ABOUT - 3D Card */
     .about {
-      padding: 90px 8% 60px;
+      padding: 140px 8% 60px;
       display: flex;
-      gap: 50px;
+      gap: 60px;
       align-items: center;
       flex-wrap: wrap;
-    }
-    .about img {
-      width: 220px;
-      height: 220px;
-      border-radius: 50%;
-      border: 4px solid var(--accent);
-      animation: pulse 3s infinite;
-    }
-    @keyframes pulse {
-      0% { transform: scale(1); }
-      50% { transform: scale(1.05); }
-      100% { transform: scale(1); }
-    }
-    .about-content {
-      max-width: 500px;
-    }
-    .about-content button {
-      margin-top: 15px;
-      padding: 10px 25px;
-      background: var(--accent);
-      border: none;
-      color: #fff;
-      border-radius: 25px;
-      cursor: pointer;
+      transform-style: preserve-3d;
     }
 
-    /* CONTACT POPUP */
+    .profile-3d {
+      position: relative;
+      transform-style: preserve-3d;
+      transition: transform 0.5s ease;
+    }
+
+    .profile-3d:hover {
+      transform: rotateY(10deg) rotateX(5deg);
+    }
+
+    .profile-3d::before {
+      content: '';
+      position: absolute;
+      inset: -20px;
+      background: linear-gradient(45deg, var(--accent), transparent, var(--accent));
+      border-radius: 50%;
+      opacity: 0.3;
+      transform: translateZ(-50px);
+      filter: blur(20px);
+      animation: glowRotate 4s linear infinite;
+    }
+
+    @keyframes glowRotate {
+      0% { transform: translateZ(-50px) rotate(0deg); }
+      100% { transform: translateZ(-50px) rotate(360deg); }
+    }
+
+    .about img {
+      width: 240px;
+      height: 240px;
+      border-radius: 50%;
+      border: 4px solid var(--accent);
+      box-shadow: var(--neon-glow), var(--depth-3);
+      transform: translateZ(50px);
+      transition: all 0.4s ease;
+    }
+
+    .about img:hover {
+      transform: translateZ(80px) scale(1.05);
+      box-shadow: 0 0 40px var(--accent-glow), 0 0 80px rgba(255, 0, 64, 0.3), var(--depth-3);
+    }
+
+    .about-content {
+      max-width: 500px;
+      transform-style: preserve-3d;
+    }
+
+    .about-content h2 {
+      font-size: 2.5rem;
+      margin-bottom: 15px;
+      text-shadow: 0 5px 15px rgba(0,0,0,0.5);
+      transform: translateZ(30px);
+    }
+
+    .about-content p {
+      transform: translateZ(20px);
+      line-height: 1.8;
+      color: rgba(255,255,255,0.8);
+    }
+
+    .about-content button {
+      margin-top: 20px;
+      padding: 14px 35px;
+      background: linear-gradient(135deg, var(--accent), #ff4080);
+      border: none;
+      color: #fff;
+      border-radius: 30px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 1rem;
+      transform: translateZ(40px);
+      box-shadow: var(--depth-2), 0 0 20px var(--accent-glow);
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .about-content button::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+      transition: left 0.5s ease;
+    }
+
+    .about-content button:hover {
+      transform: translateZ(60px) translateY(-3px);
+      box-shadow: var(--depth-3), var(--neon-glow);
+    }
+
+    .about-content button:hover::before {
+      left: 100%;
+    }
+    
+    /* CONTACT POPUP - CUSTOM POSITION WITH BLUR */
     .contact-popup {
       display: none;
       position: fixed;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.85);
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.98); /* Dark overlay */
+      backdrop-filter: blur(25px); /* Strong blur */
+      -webkit-backdrop-filter: blur(25px);
       justify-content: center;
       align-items: center;
       z-index: 2000;
       opacity: 0;
       transition: opacity 0.4s ease;
+      perspective: 1000px;
+      overflow: hidden;
     }
     .contact-popup.active {
+      display: flex;
       opacity: 1;
     }
 
     .contact-box {
-      background: var(--card);
-      padding: 35px;
-      border-radius: 20px;
+      background: linear-gradient(145deg, var(--card), #0a0a0f);
+      padding: 50px 45px 40px;
+      border-radius: 30px;
       text-align: center;
-      max-width: 420px;
-      width: 90%;
-      transform: scale(0.9);
-      transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);
-      border: 1px solid rgba(255, 0, 0, 0.2);
+      max-width: 480px;
+      width: 92%;
+      position: absolute; /* Changed to absolute for custom positioning */
+      transform: scale(0.7) rotateX(-20deg);
+      transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+      box-shadow: var(--depth-3);
+      border: 1px solid rgba(255, 0, 64, 0.3);
+      transform-style: preserve-3d;
+      margin: auto;
     }
     .contact-popup.active .contact-box {
-      transform: scale(1);
+      transform: scale(1) rotateX(0deg);
     }
 
     .contact-box h3 {
-      margin-bottom: 20px;
+      margin-bottom: 30px;
       color: var(--accent);
-      font-size: 1.6rem;
+      font-size: 2rem;
+      font-weight: 700;
+      text-shadow: 0 0 15px var(--accent-glow);
+      transform: translateZ(40px);
+      letter-spacing: 1px;
     }
 
     .contact-box a {
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 12px;
-      margin: 14px 0;
-      padding: 12px 0;
+      gap: 15px;
+      margin: 18px 0;
+      padding: 18px 28px;
       color: #fff;
       text-decoration: none;
       font-size: 1.1rem;
-      border-radius: 12px;
-      transition: background 0.25s, color 0.25s;
+      font-weight: 500;
+      border-radius: 16px;
+      background: linear-gradient(145deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02));
+      border: 1px solid rgba(255, 0, 64, 0.15);
+      transform: translateZ(25px);
+      transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+      box-shadow: var(--depth-1);
+      position: relative;
+      overflow: hidden;
+    }
+    .contact-box a::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 0, 64, 0.1), transparent);
+      transition: left 0.5s ease;
     }
     .contact-box a:hover {
-      background: rgba(255, 0, 0, 0.15);
+      background: linear-gradient(145deg, rgba(255, 0, 64, 0.15), rgba(255, 0, 64, 0.05));
       color: var(--accent);
+      transform: translateZ(50px) translateX(8px) scale(1.02);
+      box-shadow: var(--depth-2);
+      border-color: rgba(255, 0, 64, 0.4);
+    }
+    .contact-box a:hover::before {
+      left: 100%;
     }
     .contact-box a i {
-      font-size: 1.3rem;
+      font-size: 1.5rem;
+      transition: transform 0.3s ease;
+    }
+    .contact-box a:hover i {
+      transform: scale(1.2) rotate(5deg);
     }
 
     .contact-box button {
-      margin-top: 20px;
-      padding: 10px 25px;
-      background: var(--accent);
+      margin-top: 30px;
+      padding: 16px 45px;
+      background: linear-gradient(135deg, var(--accent), #ff4080);
       color: white;
       border: none;
-      border-radius: 25px;
+      border-radius: 35px;
       cursor: pointer;
       font-weight: 600;
-      transition: background 0.3s;
+      font-size: 1.05rem;
+      transform: translateZ(35px);
+      box-shadow: var(--depth-2);
+      transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+      position: relative;
+      overflow: hidden;
+    }
+    .contact-box button::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+      transition: left 0.5s ease;
     }
     .contact-box button:hover {
-      background: #cc0000;
+      transform: translateZ(60px) translateY(-5px) scale(1.05);
+      box-shadow: var(--depth-3);
+    }
+    .contact-box button:hover::before {
+      left: 100%;
     }
 
-    /* WORK SECTION */
+    /* Close button - Inside the box */
+    .contact-close {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      width: 40px;
+      height: 40px;
+      background: linear-gradient(135deg, var(--accent), #ff4080);
+      border: none;
+      border-radius: 50%;
+      color: white;
+      font-size: 1.2rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: var(--depth-2);
+      transform: translateZ(60px);
+      transition: all 0.3s ease;
+      z-index: 10;
+    }
+    .contact-close:hover {
+      transform: translateZ(80px) scale(1.1);
+      box-shadow: var(--depth-3);
+    }
+    
+    /* WORK SECTION - 3D Gallery */
     section {
-      padding: 60px 8% 80px;
+      padding: 80px 8% 100px;
+      transform-style: preserve-3d;
     }
     .section-title {
-      font-size: 2.2rem;
-      border-left: 5px solid var(--accent);
-      padding-left: 15px;
-      margin-bottom: 25px;
+      font-size: 2.5rem;
+      margin-bottom: 35px;
+      text-shadow: 0 5px 20px rgba(0,0,0,0.5);
+      position: relative;
+      display: inline-block;
+    }
+
+    .section-title::after {
+      content: '';
+      position: absolute;
+      bottom: -10px;
+      left: 0;
+      width: 60px;
+      height: 4px;
+      background: linear-gradient(90deg, var(--accent), transparent);
+      box-shadow: 0 0 10px var(--accent-glow);
     }
 
     .work-menu {
       display: flex;
       flex-wrap: wrap;
-      gap: 12px;
-      margin-bottom: 20px;
+      gap: 15px;
+      margin-bottom: 30px;
+      transform-style: preserve-3d;
     }
     .work-menu button {
-      background: none;
-      border: 1px solid var(--accent);
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 0, 64, 0.3);
       color: #fff;
-      padding: 8px 18px;
-      border-radius: 20px;
+      padding: 12px 24px;
+      border-radius: 25px;
       cursor: pointer;
+      font-weight: 500;
+      transform: translateZ(10px);
+      transition: all 0.3s ease;
+      box-shadow: var(--depth-1);
     }
     .work-menu button.active,
     .work-menu button:hover {
-      background: var(--accent);
+      background: linear-gradient(135deg, var(--accent), #ff4080);
+      border-color: var(--accent);
+      transform: translateZ(30px) translateY(-3px);
+      box-shadow: var(--depth-2), var(--neon-glow);
     }
 
     .sub-menu {
       display: none;
-      gap: 12px;
-      margin-bottom: 25px;
+      gap: 15px;
+      margin-bottom: 35px;
       flex-wrap: wrap;
+      transform-style: preserve-3d;
     }
     .sub-menu button {
-      padding: 7px 18px;
-      border-radius: 18px;
-      border: 1px solid var(--accent);
-      background: none;
+      padding: 10px 22px;
+      border-radius: 20px;
+      border: 1px solid rgba(255, 0, 64, 0.2);
+      background: rgba(255, 255, 255, 0.02);
       color: #fff;
       cursor: pointer;
+      font-weight: 500;
+      transform: translateZ(5px);
+      transition: all 0.3s ease;
+      box-shadow: var(--depth-1);
     }
     .sub-menu button.active,
     .sub-menu button:hover {
-      background: var(--accent);
+      background: linear-gradient(135deg, var(--accent), #ff4080);
+      border-color: var(--accent);
+      transform: translateZ(25px) translateY(-2px);
+      box-shadow: var(--depth-2), 0 0 20px var(--accent-glow);
     }
 
-    /* ✅ 2 COLUMNS GRID */
+    /* 3D Grid with Perspective */
     .work-grid {
       display: none;
       grid-template-columns: repeat(2, 1fr);
-      gap: 20px;
-      padding: 0 5%;
+      gap: 30px;
+      padding: 0;
+      transform-style: preserve-3d;
+      perspective: 1000px;
     }
     .work-grid.active {
       display: grid;
     }
 
     .work-card {
-      background: var(--card);
-      border-radius: 15px;
+      background: linear-gradient(145deg, var(--card), #0d0d12);
+      border-radius: 20px;
       overflow: hidden;
       position: relative;
-      padding-top: 56.25%; /* 16:9 */
+      padding-top: 56.25%;
       height: 0;
+      transform-style: preserve-3d;
+      transform: rotateX(5deg) translateZ(0);
+      transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      box-shadow: var(--depth-2), 0 0 0 rgba(255, 0, 64, 0);
+      border: 1px solid rgba(255, 0, 64, 0.1);
     }
+
+    .work-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, transparent 50%, rgba(255, 0, 64, 0.1) 100%);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      z-index: 2;
+      pointer-events: none;
+    }
+
+    .work-card:hover {
+      transform: rotateX(0deg) translateZ(50px) scale(1.02);
+      box-shadow: var(--depth-3), 0 0 40px rgba(255, 0, 64, 0.2);
+      border-color: rgba(255, 0, 64, 0.3);
+    }
+
+    .work-card:hover::before {
+      opacity: 1;
+    }
+
     .work-card img {
       position: absolute;
       top: 0;
@@ -224,11 +521,11 @@
       width: 100%;
       height: 100%;
       object-fit: cover;
-      transition: transform 0.3s ease;
+      transition: all 0.4s ease;
       cursor: pointer;
     }
     .work-card:hover img {
-      transform: scale(1.08);
+      transform: scale(1.1);
     }
 
     .work-card .placeholder {
@@ -237,18 +534,18 @@
       left: 0;
       width: 100%;
       height: 100%;
-      background: #222;
+      background: linear-gradient(145deg, #1a1a24, #12121a);
       display: flex;
       align-items: center;
       justify-content: center;
-      color: #666;
+      color: #555;
       font-size: 14px;
       text-align: center;
-      padding: 10px;
-      line-height: 1.4;
+      padding: 20px;
+      line-height: 1.6;
     }
-
-    /* ✅ LIGHTBOX */
+    
+    /* 3D LIGHTBOX */
     .lightbox {
       position: fixed;
       top: 0;
@@ -256,12 +553,14 @@
       width: 100%;
       height: 100%;
       background: rgba(0, 0, 0, 0.95);
+      backdrop-filter: blur(20px);
       display: none;
       justify-content: center;
       align-items: center;
       z-index: 3000;
       opacity: 0;
-      transition: opacity 0.3s ease;
+      transition: opacity 0.4s ease;
+      perspective: 1000px;
     }
     .lightbox.active {
       display: flex;
@@ -271,64 +570,116 @@
       position: relative;
       max-width: 90%;
       max-height: 90%;
+      transform-style: preserve-3d;
+      transform: rotateY(-5deg) scale(0.9);
+      transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    .lightbox.active .lightbox-content {
+      transform: rotateY(0deg) scale(1);
     }
     .lightbox img {
       max-width: 100%;
-      max-height: 90vh;
-      border: 3px solid var(--accent);
-      border-radius: 8px;
-      box-shadow: 0 0 30px rgba(255, 0, 0, 0.5);
+      max-height: 85vh;
+      border: 2px solid var(--accent);
+      border-radius: 15px;
+      box-shadow: var(--depth-3), var(--neon-glow);
+      transform: translateZ(50px);
     }
     .lightbox .close-btn {
       position: absolute;
-      top: -50px;
-      right: 0;
+      top: -60px;
+      right: -20px;
       color: white;
-      font-size: 2rem;
+      font-size: 1.5rem;
       cursor: pointer;
-      background: var(--accent);
-      width: 40px;
-      height: 40px;
+      background: linear-gradient(135deg, var(--accent), #ff4080);
+      width: 50px;
+      height: 50px;
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
+      box-shadow: var(--depth-2), 0 0 20px var(--accent-glow);
+      transform: translateZ(100px);
+      transition: all 0.3s ease;
+      border: none;
     }
-
+    .lightbox .close-btn:hover {
+      transform: translateZ(120px) scale(1.1) rotate(90deg);
+      box-shadow: var(--depth-3), var(--neon-glow);
+    }
+    
+    /* 3D Footer */
     footer {
       text-align: center;
-      padding: 30px;
-      background: #000;
+      padding: 40px;
+      background: linear-gradient(180deg, transparent, rgba(255, 0, 64, 0.05));
+      border-top: 1px solid rgba(255, 0, 64, 0.1);
+      position: relative;
+    }
+
+    footer::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 200px;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--accent), transparent);
+      box-shadow: 0 0 20px var(--accent-glow);
     }
 
     @media (max-width: 768px) {
+      nav {
+        width: calc(100% - 20px);
+        padding: 12px 20px;
+      }
       .about {
         text-align: center;
         justify-content: center;
-        padding: 100px 8% 60px;
+        padding: 120px 5% 60px;
+      }
+      .about img {
+        width: 200px;
+        height: 200px;
       }
       section {
-        padding: 60px 8%;
+        padding: 60px 5%;
       }
       .work-grid {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 15px;
+        grid-template-columns: 1fr;
+        gap: 20px;
+      }
+      .work-card {
+        transform: rotateX(0deg);
       }
       .lightbox .close-btn {
-        top: -40px;
-        right: 0;
+        top: -50px;
+        right: 10px;
+        width: 45px;
+        height: 45px;
+      }
+      .contact-box {
+        padding: 40px 30px 30px;
+        max-width: 95%;
       }
     }
   </style>
 </head>
 <body>
 
-  <nav>
-    <h1>KZ GFXx</h1>
-  </nav>
+  <!-- 3D Particles -->
+  <div class="particles" id="particles"></div>
 
+  <nav>
+    <h1>KZ GFX</h1>
+  </nav>
+  
   <div class="about">
-    <img src="https://media1.tenor.com/m/_l-61M8VusgAAAAC/gojo-gojo-satoru.gif" onerror="this.src='https://via.placeholder.com/220/ff0000/ffffff?text=KRINZY'" alt="Profile GIF">
+    <div class="profile-3d">
+      <img src="https://media1.tenor.com/m/_l-61M8VusgAAAAC/gojo-gojo-satoru.gif" onerror="this.src='https://via.placeholder.com/220/ff0000/ffffff?text=KRINZY'" alt="Profile GIF">
+    </div>
     <div class="about-content">
       <h2>About Me</h2>
       <p>I design thumbnails, overlays, PSDs & branding for creators.</p>
@@ -336,20 +687,23 @@
       <button onclick="openContact()">Contact Me</button>
     </div>
   </div>
-
-  <div class="contact-popup" id="contact">
-    <div class="contact-box">
+  
+  <div class="contact-popup" id="contact" onclick="closeContactOnOutside(event)">
+    <div class="contact-box" id="contactBox">
+      <button class="contact-close" onclick="closeContact()">&times;</button>
       <h3>Get In Touch</h3>
-      <a href="https://discord.com/users/1087249072848633886">DM ME HERE</a>
+      <a href="https://discord.com/users/1087249072848633886">
+        <i class="fab fa-discord"></i> DM ME HERE
+      </a>
       <a href="https://www.youtube.com/@KR1NZY">
         <i class="fab fa-youtube"></i> Support him
-      <a href="https://discord.gg/ytNwnZkda8">
-        <i class="fab fa-discord"></i>Friend Discord
       </a>
-      <button onclick="closeContact()">Close</button>
+      <a href="https://discord.gg/ytNwnZkda8">
+        <i class="fab fa-discord"></i> Friend Discord
+      </a>
     </div>
   </div>
-
+  
   <section>
     <h2 class="section-title">My Work</h2>
 
@@ -393,27 +747,106 @@
   </div>
 
   <footer>Copyright © 2026. All rights reserved.</footer>
-
+  
   <script>
+    // ============================================
+    // ✅ CUSTOM POSITION SETTINGS - EDIT HERE!
+    // ============================================
+    const contactPosition = {
+      x: '50%',      // Horizontal position (0% = left, 50% = center, 100% = right)
+      y: '350px',    // Vertical position (0px = top, 150px = below nav bar, etc.)
+      z: '0px'       // Depth position (0px = normal, 50px = closer, -50px = farther)
+    };
+    
+    // Transform settings for animation
+    const contactTransform = {
+      scale: 0.7,        // Start scale (0.7 = 70% size)
+      rotateX: -20,      // Start rotation X (-20deg)
+      rotateY: 0,        // Start rotation Y (0deg)
+      translateX: 0,     // Start X offset
+      translateY: -100,  // Start Y offset (move up)
+      translateZ: 0      // Start Z offset
+    };
+    
+    // ============================================
+    // END OF SETTINGS - Don't edit below
+    // ============================================
+
+    // Apply custom position on load
+    document.addEventListener('DOMContentLoaded', () => {
+      const contactBox = document.getElementById('contactBox');
+      
+      // Set initial position
+      contactBox.style.left = contactPosition.x;
+      contactBox.style.top = contactPosition.y;
+      contactBox.style.transform = `translate(-50%, -50%) translateZ(${contactPosition.z}) scale(${contactTransform.scale}) rotateX(${contactTransform.rotateX}deg) rotateY(${contactTransform.rotateY}deg) translateX(${contactTransform.translateX}px) translateY(${contactTransform.translateY}px) translateZ(${contactTransform.translateZ}px)`;
+      
+      // Set active position (when popup opens)
+      contactBox.style.transition = 'all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1)';
+    });
+
+    // Create 3D particles
+    function createParticles() {
+      const container = document.getElementById('particles');
+      for (let i = 0; i < 30; i++) {
+        const particle = document.createElement('div');
+        particle.className = 'particle';
+        particle.style.left = Math.random() * 100 + '%';
+        particle.style.top = Math.random() * 100 + '%';
+        particle.style.animationDelay = Math.random() * 15 + 's';
+        particle.style.animationDuration = (10 + Math.random() * 10) + 's';
+        container.appendChild(particle);
+      }
+    }
+
+    // 3D tilt effect for cards
+    function addTiltEffect() {
+      const cards = document.querySelectorAll('.work-card');
+      cards.forEach(card => {
+        card.addEventListener('mousemove', (e) => {
+          const rect = card.getBoundingClientRect();
+          const x = e.clientX - rect.left;
+          const y = e.clientY - rect.top;
+          const centerX = rect.width / 2;
+          const centerY = rect.height / 2;
+          const rotateX = (y - centerY) / 20;
+          const rotateY = (centerX - x) / 20;
+          card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateZ(50px) scale(1.02)`;
+        });
+        
+        card.addEventListener('mouseleave', () => {
+          card.style.transform = '';
+        });
+      });
+    }
+
     const workData = {
       thumb: [
-        "https://media.discordapp.net/attachments/1217474476963532851/1382585713719115787/Picsart_25-06-12_09-44-31-864.png?ex=697846c9&is=6976f549&hm=c680e9125cf6d671ede157038e81dee414ddac8c339007fea5bff58ff69e979d&=&format=webp&quality=lossless&width=986&height=668",
-        "https://media.discordapp.net/attachments/1217474476963532851/1382585714889199646/Picsart_25-06-12_10-16-10-678.png?ex=697846c9&is=6976f549&hm=38456d0233c6056c3f54d8bb749205731b628f579a78a6037b480525d0e8e30e&=&format=webp&quality=lossless&width=986&height=668",
-        "https://media.discordapp.net/attachments/1217474476963532851/1382585715338117213/Picsart_25-06-12_10-17-48-444.png?ex=697846c9&is=6976f549&hm=1f5454ad0700e98e5352ae385a30d22d8074b2dfb7be16daae56857948156fad&=&format=webp&quality=lossless&width=986&height=668",
-        "https://media.discordapp.net/attachments/1217474476963532851/1382585714251661416/Picsart_25-06-12_10-08-45-156.png?ex=697846c9&is=6976f549&hm=d33ad4f34d3dce02ddc5c3be204eea1014d9225577ffad2e2f711b581fa7963b&=&format=webp&quality=lossless&width=986&height=668"
+        "https://media.discordapp.net/attachments/1217474476963532851/1382585715338117213/Picsart_25-06-12_10-17-48-444.png?ex=6976f549&is=6975a3c9&hm=342c25860be8e316fabb449ed4db6ae271cb53525a961a5faaf1c3b40be7eb07&=&format=webp&quality=lossless&width=986&height=668",
+        "https://media.discordapp.net/attachments/1217474476963532851/1382585714889199646/Picsart_25-06-12_10-16-10-678.png?ex=6976f549&is=6975a3c9&hm=77d2107fba6723eafe8850b450d12ff7e47631150b32a27cd85f334f02ecb541&=&format=webp&quality=lossless&width=986&height=668",
+        "https://media.discordapp.net/attachments/1217474476963532851/1382585714251661416/Picsart_25-06-12_10-08-45-156.png?ex=6976f549&is=6975a3c9&hm=580688882ac55af90b3da54314c8d67d713283d5f8705f3082e797933959bad7&=&format=webp&quality=lossless&width=986&height=668",
+        "https://media.discordapp.net/attachments/1217474476963532851/1382585713719115787/Picsart_25-06-12_09-44-31-864.png?ex=6976f549&is=6975a3c9&hm=f2fb11aa69ce2e3f2b8540bad0032fea049e2bd29fbed11cbc5e4ceba9c5cf84&=&format=webp&quality=lossless&width=986&height=668"
       ],
       "overlay-normal": [
         "https://media.discordapp.net/attachments/1217474476963532851/1464934156495622379/Picsart_26-01-25_16-05-19-856.png?ex=697745c0&is=6975f440&hm=0f9a44188169869d25196cb8b74b8665fda6322a6f38287f3e24e4a5d36bf024&=&format=webp&quality=lossless&width=1188&height=668",
         "https://media.discordapp.net/attachments/1217474476963532851/1464934156940345344/Picsart_26-01-25_16-14-55-802.png?ex=697745c0&is=6975f440&hm=31e6fd40ded88a7c195356ca04c4af382313a219cc2db8cebe74c0df7c476bae&=&format=webp&quality=lossless&width=1188&height=668"
       ],
-      "short overlay": ["https://media.discordapp.net/attachments/1217474476963532851/1464947094753247242/Picsart_26-01-25_17-06-32-901.png?ex=697751cc&is=6976004c&hm=a226a5955d643d5c200412d76938ca58846b18c8551156ce17cb4402a35b813e&=&format=webp&quality=lossless&width=688&height=386","https://media.discordapp.net/attachments/1217474476963532851/1464943901164175400/Picsart_26-01-25_16-47-28-927.png?ex=69774ed3&is=6975fd53&hm=6d534ef6588c30e8e249555778823a4a5313965ca2ff601e81d962921d21ab82&=&format=webp&quality=lossless&width=1186&height=668"],
+      "short overlay": [
+        "https://media.discordapp.net/attachments/1217474476963532851/1464947094753247242/Picsart_26-01-25_17-06-32-901.png?ex=697751cc&is=6976004c&hm=a226a5955d643d5c200412d76938ca58846b18c8551156ce17cb4402a35b813e&=&format=webp&quality=lossless&width=688&height=386",
+        "https://media.discordapp.net/attachments/1217474476963532851/1464943901164175400/Picsart_26-01-25_16-47-28-927.png?ex=69774ed3&is=6975fd53&hm=6d534ef6588c30e8e249555778823a4a5313965ca2ff601e81d962921d21ab82&=&format=webp&quality=lossless&width=1186&height=668"
+      ],
       "overlay-animated": [
         "assets/overlays/animated/1.gif"
       ],
       "psd-free": ["assets/psd/free/1.jpg"],
       "psd-premium": ["assets/psd/premium/1.jpg"],
-      logo: ["https://media.discordapp.net/attachments/1217474476963532851/1464938017671090280/Picsart_26-01-25_16-26-07-118.png?ex=69774958&is=6975f7d8&hm=28642ad86e8481ecf4dc3b451830e51b4eca70dd9815944a2574b5dfecb1e75f&=&format=webp&quality=lossless&width=1188&height=668","https://media.discordapp.net/attachments/1217474476963532851/1464938015385325678/Picsart_26-01-25_16-30-17-763.png?ex=69774958&is=6975f7d8&hm=1592d02815c1213b6f9f175c4b1624243e7623eaf41c77622aaecfd4585a93e6&=&format=webp&quality=lossless&width=1188&height=668","https://media.discordapp.net/attachments/1217474476963532851/1464938016857653431/Picsart_26-01-25_16-27-51-624.png?ex=69774958&is=6975f7d8&hm=7ee6b2bfce7d5a16f1f255f6618e1e1fc15690dab1b6c74dfbc052eea1b51650&=&format=webp&quality=lossless&width=1188&height=668"],
-      banner: ["https://media.discordapp.net/attachments/1217474476963532851/1382585715811942491/Picsart_25-06-12_10-22-16-109.png?ex=697846c9&is=6976f549&hm=6eca67723c0638694b1a6a7e7cbbbd5d9d50761de94a02e2f232d858c1d85d1b&=&format=webp&quality=lossless&width=986&height=668",
+      logo: [
+        "https://media.discordapp.net/attachments/1217474476963532851/1464938017671090280/Picsart_26-01-25_16-26-07-118.png?ex=69774958&is=6975f7d8&hm=28642ad86e8481ecf4dc3b451830e51b4eca70dd9815944a2574b5dfecb1e75f&=&format=webp&quality=lossless&width=1188&height=668",
+        "https://media.discordapp.net/attachments/1217474476963532851/1464938015385325678/Picsart_26-01-25_16-30-17-763.png?ex=69774958&is=6975f7d8&hm=1592d02815c1213b6f9f175c4b1624243e7623eaf41c77622aaecfd4585a93e6&=&format=webp&quality=lossless&width=1188&height=668",
+        "https://media.discordapp.net/attachments/1217474476963532851/1464938016857653431/Picsart_26-01-25_16-27-51-624.png?ex=69774958&is=6975f7d8&hm=7ee6b2bfce7d5a16f1f255f6618e1e1fc15690dab1b6c74dfbc052eea1b51650&=&format=webp&quality=lossless&width=1188&height=668"
+      ],
+      banner: [
+        "https://media.discordapp.net/attachments/1217474476963532851/1382585715811942491/Picsart_25-06-12_10-22-16-109.png?ex=6976f549&is=6975a3c9&hm=a75d82b0622b3d149bf133b61f98d978ecf9b14a0ce5ec3b151646e9255a44af&=&format=webp&quality=lossless&width=986&height=668",
         "https://media.discordapp.net/attachments/1217474476963532851/1464928084124762235/make-professional-anime-youtube-banner-yt-anime-banner-gaming-banner.jpg?ex=69774018&is=6975ee98&hm=5e9dd622e5ebbfb6a18651bee372af2d16f13eef1bca1bdc4679921c4a83fc0f&=&format=webp&width=1186&height=668"
       ],
       score: [
@@ -426,7 +859,6 @@
     function openLightbox(src) {
       document.getElementById('lightbox-img').src = src;
       document.getElementById('lightbox').classList.add('active');
-      // ❌ DO NOT disable body scroll → allow scrolling
     }
 
     function closeLightbox() {
@@ -505,31 +937,70 @@
       document.querySelectorAll('.work-grid').forEach(g => g.classList.remove('active'));
       document.getElementById(id)?.classList.add('active');
     }
-
+    
     // ✅ CONTACT
     function openContact() {
       const popup = document.getElementById('contact');
+      const contactBox = document.getElementById('contactBox');
+      
       popup.style.display = 'flex';
-      setTimeout(() => popup.classList.add('active'), 10);
+      
+      // Force reflow for animation
+      void popup.offsetHeight;
+      
+      // Apply initial transform
+      contactBox.style.transform = `translate(-50%, -50%) translateZ(${contactPosition.z}) scale(${contactTransform.scale}) rotateX(${contactTransform.rotateX}deg) rotateY(${contactTransform.rotateY}deg) translateX(${contactTransform.translateX}px) translateY(${contactTransform.translateY}px) translateZ(${contactTransform.translateZ}px)`;
+      
+      requestAnimationFrame(() => {
+        popup.classList.add('active');
+        
+        // After small delay, animate to final position
+        setTimeout(() => {
+          contactBox.style.transform = `translate(-50%, -50%) translateZ(${contactPosition.z}) scale(1) rotateX(0deg) rotateY(0deg) translateX(0) translateY(0) translateZ(0)`;
+        }, 50);
+      });
+      
+      document.body.style.overflow = 'hidden';
     }
 
     function closeContact() {
       const popup = document.getElementById('contact');
+      const contactBox = document.getElementById('contactBox');
+      
+      // Animate back to start position before closing
+      contactBox.style.transform = `translate(-50%, -50%) translateZ(${contactPosition.z}) scale(${contactTransform.scale}) rotateX(${contactTransform.rotateX}deg) rotateY(${contactTransform.rotateY}deg) translateX(${contactTransform.translateX}px) translateY(${contactTransform.translateY}px) translateZ(${contactTransform.translateZ}px)`;
+      
       popup.classList.remove('active');
-      setTimeout(() => popup.style.display = 'none', 400);
+      
+      setTimeout(() => {
+        popup.style.display = 'none';
+        document.body.style.overflow = '';
+      }, 400);
+    }
+
+    function closeContactOnOutside(e) {
+      if (e.target === document.getElementById('contact')) {
+        closeContact();
+      }
     }
 
     document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && document.getElementById('contact').style.display !== 'none') {
-        closeContact();
+      if (e.key === 'Escape') {
+        const popup = document.getElementById('contact');
+        if (popup.classList.contains('active')) {
+          closeContact();
+        }
       }
     });
-
+    
     // ✅ INIT
     document.addEventListener('DOMContentLoaded', () => {
+      createParticles();
       renderWorkGrids();
+      setTimeout(addTiltEffect, 100);
     });
   </script>
 
+  <script src="https://huggingface.co/deepsite/deepsite-badge.js"></script>
 </body>
 </html>
